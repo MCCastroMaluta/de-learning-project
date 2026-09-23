@@ -1,0 +1,28 @@
+name: Daily ticket ingestion
+
+on:
+  schedule:
+    - cron: "0 5 * * *"
+  workflow_dispatch:
+
+jobs:
+  generate-tickets:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: pip install -r ingestion/requirements.txt
+
+      - name: Run daily ticket generator
+        env:
+          PGHOST: ${{ secrets.PGHOST }}
+          PGUSER: ${{ secrets.PGUSER }}
+          PGPASSWORD: ${{ secrets.PGPASSWORD }}
+        run: python3 ingestion/generate_daily_tickets.py
